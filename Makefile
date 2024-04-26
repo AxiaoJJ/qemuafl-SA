@@ -1,10 +1,11 @@
 CC = clang
 CXX = clang++
-CFLAGS = -fPIC
-CXXFLAGS = -fPIC -std=c++17
+CFLAGS = -fPIC -g
+CXXFLAGS = -fPIC -std=c++17 -g
 LDFLAGS = -shared -lstdc++
 # This is for the qemu plugin API and built-in backend headers
-INCLUDES = -I $(shell pwd)/include/
+INCLUDES = -I$(shell pwd)/include/ -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -lglib-2.0
+#INCLUDES = -I $(shell pwd)/include/
 PLUGIN = libibresolver.so
 SRC = src/plugin.cpp
 ALL_OBJS = src/plugin.o src/binaryninja_backend.o src/simple_backend.o
@@ -53,5 +54,5 @@ demo: $(DEMO_SRC)
 	$(CC) $< $(INCLUDES) $(CFLAGS) -shared $(LINK_PLUGIN) -o $(DEMO_BACKEND)
 
 clean:
-	rm -f $(PLUGIN) $(DEMO_BACKEND) $(ALL_OBJS)
+	rm -f $(PLUGIN)  $(ALL_OBJS)
 

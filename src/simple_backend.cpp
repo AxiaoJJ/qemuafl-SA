@@ -25,7 +25,7 @@ extern "C" bool is_indirect_branch_default_impl(uint8_t *insn_data, size_t insn_
             // branch which is omitted in the output. It may cause the plugin to print spurious
             // warnings about consecutive indirect branches not being handled properly though.
             const uint32_t blx_variable_bits = 0xf000000f;
-            const uint32_t blx_constant_bits = 0x012fff30;
+            const uint32_t blx_constant_bits = 0x012fff30;      //blx A1格式的模板，高4位和低4位用于指定寄存器编号
             // Arbitrarily set all variable bits in the blx instruction before comparing with the
             // input instruction
             const uint32_t blx = blx_constant_bits | blx_variable_bits;
@@ -35,7 +35,7 @@ extern "C" bool is_indirect_branch_default_impl(uint8_t *insn_data, size_t insn_
             uint32_t b3 = insn_data[3];
             uint32_t word = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
             // Set all variable bits in the instruction
-            word |= blx_variable_bits;
+            word |= blx_variable_bits;      //检测固定位是不是和blx一致
             if (word == blx) {
                 return true;
             }

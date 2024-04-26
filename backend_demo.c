@@ -8,22 +8,27 @@
 typedef enum arch_t {
     arm,
     x86_64,
-    unknown,
+    mips,
+    mipsel,
 } arch_t;
 
-static arch_t arch = unknown;
+static arch_t arch = arm;
 
 extern bool arch_supported(const char *arch_name) {
-    // Make sure to initialize the built-in backend if it's going to be used as a fallback
-    if (!arch_supported_default_impl(arch_name)) {
-        return false;
-    }
     if (!strcmp(arch_name, "arm")) {
         arch = arm;
         return true;
     }
     if (!strcmp(arch_name, "x86_64")) {
         arch = x86_64;
+        return true;
+    }
+    if (!strcmp(arch_name, "mips")) {
+        arch = mips;
+        return true;
+    }
+    if (!strcmp(arch_name, "mipsel")) {
+        arch = mipsel;
         return true;
     }
     return false;
@@ -69,7 +74,38 @@ extern bool is_indirect_branch(uint8_t *insn_data, size_t insn_size) {
                 return true;
             }
         }
+    }else if (arch == mipsel) {
+    // Handles jr and jalr instructions
+        if (insn_size == 4) {
+            uint32_t instruction = (insn_data[0] << 24) | (insn_data[1] << 16) | (insn_data[2] << 8) | insn_data[3];
+
+            if (instruction == 0x0320f809) {
+                printf("Found a `jalr $t9` instruction\n");
+                return true;
+            }
+
+            if (instruction == 0x03020008) {
+                printf("Found a `jr $t9` instruction\n");
+                return true;
+            }
+        }
+    }else if (arch == mips) {
+    // Handles jr and jalr instructions
+        if (insn_size == 4) {
+            uint32_t instruction = (insn_data[0] << 24) | (insn_data[1] << 16) | (insn_data[2] << 8) | insn_data[3];
+
+            if (instruction == 0x09f82003) {
+                printf("Found a `jalr $t9` instruction\n");
+                return true;
+            }
+
+            if (instruction == 0x08002003) {
+                printf("Found a `jr $t9` instruction\n");
+                return true;
+            }
+        }
     }
+
     // If we can't tell if the instruction is an indirect branch, let's use the
     // built-in backend as a fallback
     return is_indirect_branch_default_impl(insn_data, insn_size);

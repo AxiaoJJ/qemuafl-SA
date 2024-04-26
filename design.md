@@ -18,6 +18,7 @@ callback is registered for all indirect branches. This callback sets the `option
 branch_addr` variable to the callsite address each time an indirect branch is executed. The
 `branch_taken` callback then uses that variable along with the destination address to write a line
 to the output file.
+#在所有的indirect branches中加入回调函数indirect_branch_exec来判断是否是间接调用；
 
 Since indirect branches may be conditional we register the `branch_skipped` execution callback for
 the instruction following an indirect branch if it falls within the same block. If these
